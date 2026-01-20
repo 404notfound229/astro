@@ -1,6 +1,6 @@
 --[[
     ASTRO UI Library v2.0
-    Load from GitHub and use with simple API
+    by @35ui, @48ui
 ]]
 
 local AstroUI = {}
@@ -12,7 +12,7 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 
--- THEME
+
 local THEME = {
     Background = Color3.fromRGB(15, 15, 15),
     Sidebar    = Color3.fromRGB(15, 15, 15),
@@ -29,7 +29,6 @@ local AccentRegistry = {}
 local SearchRegistry = {}
 local ActiveDropdownCloseFunc = nil
 
--- Utility Functions
 local function getParent()
     local success, result = pcall(function() return CoreGui end)
     if success and result then return result end
@@ -65,14 +64,12 @@ local function UpdateTheme(newColor)
     end
 end
 
--- Cleanup old instances
 for _, v in pairs(getParent():GetChildren()) do
     if v.Name == "AstroUI" then v:Destroy() end
 end
 
-----------------------------------------------------------------
--- WINDOW CLASS
-----------------------------------------------------------------
+
+
 local Window = {}
 Window.__index = Window
 
@@ -86,7 +83,6 @@ function AstroUI:CreateWindow(config)
     self.Pages = {}
     self.CurrentPage = nil
     
-    -- Create ScreenGui
     self.ScreenGui = create("ScreenGui", {
         Name = "AstroUI",
         Parent = getParent(),
@@ -94,7 +90,7 @@ function AstroUI:CreateWindow(config)
         ResetOnSpawn = false
     })
     
-    -- Main Frame
+     
     self.MainFrame = create("Frame", {
         Name = "MainFrame",
         Size = self.Size,
@@ -106,16 +102,13 @@ function AstroUI:CreateWindow(config)
     })
     makeCorner(6, self.MainFrame)
     
-    -- Dropdown Layer
     self.DropdownLayer = create("Frame", {
         Name = "DropdownLayer", Size = UDim2.new(1, 0, 1, 0), 
         BackgroundTransparency = 1, Parent = self.MainFrame, ZIndex = 100
     })
     
-    -- Header
     self:_createHeader()
     
-    -- Body
     self:_createBody()
     
     return self
@@ -127,7 +120,6 @@ function Window:_createHeader()
         BackgroundTransparency = 1, Parent = self.MainFrame, ZIndex = 10
     })
     
-    -- Dragging
     local dragging, dragInput, dragStart, startPos
     Header.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -149,7 +141,6 @@ function Window:_createHeader()
         end
     end)
     
-    -- Title
     local Title = create("TextLabel", {
         Text = self.Title, Font = Enum.Font.GothamBold, TextSize = 22, TextColor3 = THEME.Accent,
         Size = UDim2.new(0, 150, 1, 0), Position = UDim2.new(0, 20, 0, 0), BackgroundTransparency = 1,
@@ -157,7 +148,6 @@ function Window:_createHeader()
     })
     RegisterAccent(Title, "TextColor3")
     
-    -- Search
     local SearchFrame = create("Frame", {
         Size = UDim2.new(0, 200, 0, 28), Position = UDim2.new(1, -210, 0.5, -14), 
         BackgroundTransparency = 1, Parent = Header
@@ -187,7 +177,6 @@ function Window:_createHeader()
         end
     end)
     
-    -- Divider
     local Divider = create("Frame", {
         Size = UDim2.new(1, 0, 0, 1), Position = UDim2.new(0, 0, 0, 50), 
         BackgroundColor3 = THEME.Accent, BorderSizePixel = 0, Parent = self.MainFrame, ZIndex = 5
@@ -227,7 +216,6 @@ function Window:AddTab(name, iconRect)
     local Tab = {}
     Tab.Name = name
     
-    -- Page
     local Page = create("ScrollingFrame", {
         Name = name.."Page", Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ScrollBarThickness = 2,
         ScrollBarImageColor3 = THEME.Accent, BorderSizePixel = 0, CanvasSize = UDim2.new(0, 0, 0, 0),
@@ -240,7 +228,6 @@ function Window:AddTab(name, iconRect)
     self.Pages[name] = Page
     Tab.Page = Page
     
-    -- Button
     local Btn = create("TextButton", {
         Name = name, Size = UDim2.new(1, -20, 0, 35), BackgroundTransparency = 1, 
         Text = "", AutoButtonColor = false, Parent = self.Sidebar
@@ -284,7 +271,6 @@ function Window:AddTab(name, iconRect)
         tween(Page, {Position = UDim2.new(0,0,0,0)})
     end)
     
-    -- Select first tab
     if not window.CurrentPage then
         window.CurrentPage = name
         BtnBG.BackgroundTransparency = 0.5
@@ -293,7 +279,6 @@ function Window:AddTab(name, iconRect)
         Page.Visible = true
     end
     
-    -- Tab Methods
     function Tab:AddToggle(config)
         local holder = create("Frame", {Size = UDim2.new(1, 0, 0, 30), BackgroundTransparency = 1, Parent = Page})
         table.insert(SearchRegistry, {Frame = holder, Text = config.Name})
